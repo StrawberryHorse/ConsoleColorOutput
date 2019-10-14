@@ -1,4 +1,5 @@
 ﻿using System;
+using ConsoleColorOutput;
 
 namespace TestCCO
 {
@@ -6,7 +7,8 @@ namespace TestCCO
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var ou = new ConsoleOutputHelper();
+            ou.WriteLine("{yellow}Hello World!{}");
         }
     }
 }
