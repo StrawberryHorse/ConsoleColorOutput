@@ -22,6 +22,9 @@ not break the output into multiple lines. Instead, the output
 should flow around the console. So this multi line
 message should fit inside the console, and get wrapped
 accordingly.");
+
+			// Fourth test case: inline colors
+			ou.WriteLine(@"So let's color {cyan}something{} in the middle.");
         }
     }
 }
