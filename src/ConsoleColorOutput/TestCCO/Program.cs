@@ -25,6 +25,44 @@ accordingly.");
 
 			// Fourth test case: inline colors
 			ou.WriteLine(@"So let's color {cyan}something{} in the middle.");
+
+			// Fifth test case
+			ou.WriteLine(@"When we are creating many text.
+
+And I mean many.
+
+Many {yellow}many{} many.
+
+We want this to pause when the console is full. 
+
+Or display.
+
+Whatever.
+
+More text here.
+
+More text here.
+
+More text here.
+
+More text here.
+
+More text here.
+
+More text here.
+
+More text here.
+
+More text here.
+
+More text here. More text here. More text here. More text here. More text here. More text here. More text here.
+More text here. More text here. More text here. More text here. More text here. More text here. More text here.
+
+More text here.
+
+More text here.
+
+");
         }
     }
 }
