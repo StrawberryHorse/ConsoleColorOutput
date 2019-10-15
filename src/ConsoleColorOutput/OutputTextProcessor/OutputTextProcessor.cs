@@ -3,13 +3,21 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ConsoleColorOutput {
-	public class ConsoleOutputHelper {
-		private static Regex colorRegex = new Regex(@"^(?:{(?<colorBefore>red|yellow|cyan|blue|green|white|)})?(?<word>[^\s{}]+)(?:{(?<colorAfter>red|yellow|cyan|blue|green|white|)}(?<suffix>[,.!])?)?$");
+namespace OutputTextProcessor {
+	/// <summary>
+	/// Process a text and send to output medium
+	/// </summary>
+	public class OutputTextProcessor {
+		private readonly IOutput output;
+		private static readonly Regex colorRegex = new Regex(@"^(?:{(?<colorBefore>red|yellow|cyan|blue|green|white|)})?(?<word>[^\s{}]+)(?:{(?<colorAfter>red|yellow|cyan|blue|green|white|)}(?<suffix>[,.!])?)?$");
+
+		public OutputTextProcessor(IOutput output) {
+			this.output = output;
+		}
 
 		public void WriteLine(string originalText) {
-			int consoleWidth = Console.BufferWidth;
-			int consoleHeight = Console.WindowHeight;
+			int consoleWidth = output.Width;
+			int consoleHeight = output.Height;
 			
 			var currentLine = new StringBuilder(120);
 
@@ -17,7 +25,9 @@ namespace ConsoleColorOutput {
 			int charsInLine = 0;
 			int lastPause = 0;
 
-			ResetColor();
+			bool insideParagraph = false;
+
+			output.SetColor(OutputColor.Default);
 
 			using (var sr = new StringReader(originalText)) {
 				while (true) {
@@ -28,11 +38,13 @@ namespace ConsoleColorOutput {
 					
 					if (line.Length == 0) {
 						if (currentLine.Length > 0 || charsInLine > 0) {
-							System.Console.WriteLine(currentLine.ToString());
+							BeginParagraphIfNeeded();
+							output.WriteText(currentLine.ToString());
+							output.EndParagraph();
 							linesWritten++;
 							PauseAfterScreenful();
 
-							System.Console.WriteLine();
+							output.WriteEmptyLine();
 							linesWritten++;
 							PauseAfterScreenful();
 
@@ -46,11 +58,15 @@ namespace ConsoleColorOutput {
 					// if this is a header line, print it out in white
 					if (line[0] == '#') {
 						line = line.Substring(1).Trim();
-						Console.ForegroundColor = ConsoleColor.White;
-						Console.WriteLine(line);
+						output.StartParagraph();
+						output.SetColor(OutputColor.White);
+						output.WriteText(line + "\n");
+						output.SetColor(OutputColor.Default);
+						output.EndParagraph();
+
 						linesWritten++;
-						ResetColor();
 						PauseAfterScreenful();
+						
 						continue;
 					}
 
@@ -76,7 +92,7 @@ namespace ConsoleColorOutput {
 
 						if (colorBefore != null) {
 							WriteCurrentLine(false);
-							System.Console.ForegroundColor = ParseColorCode(colorBefore);
+							output.SetColor(ParseColorCode(colorBefore));
 						}
 
 						if (w.Length + currentLine.Length + charsInLine + 1 >= consoleWidth) {
@@ -87,7 +103,7 @@ namespace ConsoleColorOutput {
 
 						if (colorAfter != null) {
 							WriteCurrentLine(false);
-							System.Console.ForegroundColor = ParseColorCode(colorAfter);
+							output.SetColor(ParseColorCode(colorAfter));
 
 							if (suffix != null) {
 								currentLine.Append(suffix + " ");
@@ -98,18 +114,28 @@ namespace ConsoleColorOutput {
 
 				if (currentLine.Length > 0 || linesWritten == 0) {
 					WriteCurrentLine(true);
+					output.EndParagraph();
 				}
 			}
 
+			void BeginParagraphIfNeeded() {
+				if (!insideParagraph) {
+					output.StartParagraph();
+					insideParagraph = true;
+				}
+			}
+			
 			void WriteCurrentLine(bool newLine) {
+				BeginParagraphIfNeeded();
+
 				if (newLine) {
-					System.Console.WriteLine(currentLine.ToString());
+					output.WriteText(currentLine.ToString() + "\n");
 					linesWritten++;
 					PauseAfterScreenful();
 					charsInLine = 0;
 				}
 				else {
-					System.Console.Write(currentLine.ToString());
+					output.WriteText(currentLine.ToString());
 					charsInLine += currentLine.Length;
 				}
 				currentLine.Clear();
@@ -118,36 +144,29 @@ namespace ConsoleColorOutput {
 			void PauseAfterScreenful() {
 				if (linesWritten - lastPause + 2 > consoleHeight) {
 					lastPause = linesWritten;
-					System.Console.Write("--more--");
-					System.Console.ReadKey();
-					System.Console.Write("\r            \r");
+					output.PauseOutput();
 				}
 			}
-
-		}
-
-		private static void ResetColor() {
-			System.Console.ForegroundColor = ConsoleColor.Gray;
 		}
 		
-		private ConsoleColor ParseColorCode(string s) {
+		private OutputColor ParseColorCode(string s) {
 			switch (s) {
 				case "red":
-					return ConsoleColor.Red;
+					return OutputColor.Red;
 				case "cyan":
-					return ConsoleColor.Cyan;
+					return OutputColor.Cyan;
 				case "yellow":
-					return ConsoleColor.Yellow;
+					return OutputColor.Yellow;
 				case "green":
-					return ConsoleColor.Green;
+					return OutputColor.Green;
 				case "blue":
-					return ConsoleColor.Blue;
+					return OutputColor.Blue;
 				case "white":
-					return ConsoleColor.White;
+					return OutputColor.White;
 				default:
-					return ConsoleColor.Gray;
+					return OutputColor.Default;
 			}
 		}
-	
+		
 	}
 }
