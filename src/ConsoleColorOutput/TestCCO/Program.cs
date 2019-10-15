@@ -27,42 +27,42 @@ accordingly.");
 			ou.WriteLine(@"So let's color {cyan}something{} in the middle.");
 
 			// Fifth test case
-			ou.WriteLine(@"When we are creating many text.
+			ou.WriteLine(@"1 When we are creating many text.
 
-And I mean many.
+2 And I mean many.
 
-Many {yellow}many{} many.
+3 Many {yellow}many{} many.
 
-We want this to pause when the console is full. 
+4 We want this to pause when the console is full. 
 
-Or display.
+5 Or display.
 
-Whatever.
+6 Whatever.
 
-More text here.
+7 More text here.
 
-More text here.
+8 More text here.
 
-More text here.
+9 More text here.
 
-More text here.
+10 More text here.
 
-More text here.
+11 More text here.
 
-More text here.
+12 More text here.
 
-More text here.
+13 More text here.
 
-More text here.
+14 More text here.
 
+15 More text here. More text here. More text here. More text here. More text here. More text here. More text here.
 More text here. More text here. More text here. More text here. More text here. More text here. More text here.
-More text here. More text here. More text here. More text here. More text here. More text here. More text here.
 
-More text here.
+16 More text here.
 
-More text here.
+17 More text here.
 
-");
+18 that should be enough. {green}DONE{}.");
         }
     }
 }

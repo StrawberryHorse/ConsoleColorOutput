@@ -9,6 +9,7 @@ namespace ConsoleColorOutput {
 
 		public void WriteLine(string originalText) {
 			int consoleWidth = Console.BufferWidth;
+			int consoleHeight = Console.WindowHeight;
 			
 			var currentLine = new StringBuilder(120);
 
@@ -29,9 +30,11 @@ namespace ConsoleColorOutput {
 						if (currentLine.Length > 0 || charsInLine > 0) {
 							System.Console.WriteLine(currentLine.ToString());
 							linesWritten++;
+							PauseAfterScreenful();
 
 							System.Console.WriteLine();
 							linesWritten++;
+							PauseAfterScreenful();
 
 							currentLine.Clear();
 							charsInLine = 0;
@@ -47,6 +50,7 @@ namespace ConsoleColorOutput {
 						Console.WriteLine(line);
 						linesWritten++;
 						ResetColor();
+						PauseAfterScreenful();
 						continue;
 					}
 
@@ -101,6 +105,7 @@ namespace ConsoleColorOutput {
 				if (newLine) {
 					System.Console.WriteLine(currentLine.ToString());
 					linesWritten++;
+					PauseAfterScreenful();
 					charsInLine = 0;
 				}
 				else {
@@ -109,6 +114,16 @@ namespace ConsoleColorOutput {
 				}
 				currentLine.Clear();
 			}
+			
+			void PauseAfterScreenful() {
+				if (linesWritten - lastPause + 2 > consoleHeight) {
+					lastPause = linesWritten;
+					System.Console.Write("--more--");
+					System.Console.ReadKey();
+					System.Console.Write("\r            \r");
+				}
+			}
+
 		}
 
 		private static void ResetColor() {
