@@ -7,7 +7,7 @@ namespace TestCCO
     {
         static void Main(string[] args)
         {
-            var ou = new ConsoleOutputHelper();
+            var ou = new OutputTextProcessor.OutputTextProcessor(new ConsoleOutput());
 
             // First test case: we need to change to color with the {color} syntax
             ou.WriteLine("{yellow}Hello World!{}");
